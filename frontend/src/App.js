@@ -4,6 +4,8 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import FeaturePage from './pages/FeaturePage';
 import AICenter from './pages/AICenter';
+import AIToolsExtra from './pages/AIToolsExtra';
+import CustomViewsPage from './pages/CustomViewsPage';
 import Sidebar from './components/Sidebar';
 import './styles/App.css';
 
@@ -49,6 +51,8 @@ function App() {
             <Route path="/crew-deployments" element={<FeaturePage feature="crew-deployments" title="Crew Deployments" />} />
             <Route path="/equipment-tracking" element={<FeaturePage feature="equipment-tracking" title="Equipment Tracking" />} />
             <Route path="/ai-center" element={<AICenter />} />
+            <Route path="/ai-tools" element={<AIToolsExtra />} />
+            <Route path="/custom-views" element={<CustomViewsPage />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </main>
