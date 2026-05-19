@@ -46,6 +46,9 @@ export default function Sidebar({ open, onToggle, user, onLogout }) {
           <button className={`sidebar-link ${location.pathname === '/ai-tools' ? 'active' : ''}`} onClick={() => navigate('/ai-tools')}>
             <span className="icon">🛠️</span> AI Field Tools
           </button>
+          <button className={`sidebar-link ${location.pathname === '/custom-views' ? 'active' : ''}`} onClick={() => navigate('/custom-views')}>
+            <span className="icon">🗺️</span> Emergency Maps
+          </button>
         </div>
 
         <div className="sidebar-section">

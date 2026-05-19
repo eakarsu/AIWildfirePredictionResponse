@@ -36,6 +36,7 @@ app.use('/api/ai-center', require('./routes/aiCenter'));
 app.use('/api/ai', require('./routes/aiFeatures'));
 app.use('/api/ext', require('./routes/extensions')); // Apply pass 5: backlog
 app.use('/api/custom', require('./routes/customFeatures'));
+app.use('/api/custom-views', require('./routes/customViews'));
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
