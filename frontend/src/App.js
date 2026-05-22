@@ -9,6 +9,9 @@ import CustomViewsPage from './pages/CustomViewsPage';
 import Sidebar from './components/Sidebar';
 import './styles/App.css';
 
+import CodexCustomVizFeature from './pages/CodexCustomVizFeature';
+import CodexOperationsFeature from './pages/CodexOperationsFeature';
+
 function App() {
   const [user, setUser] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -37,6 +40,9 @@ function App() {
         <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} user={user} onLogout={handleLogout} />
         <main className={`main-content ${sidebarOpen ? '' : 'expanded'}`}>
           <Routes>
+        <Route path="/codex/custom-viz" element={<CodexCustomVizFeature />} />
+        <Route path="/codex/operations" element={<CodexOperationsFeature />} />
+
             <Route path="/" element={<Dashboard />} />
             <Route path="/risk-assessments" element={<FeaturePage feature="risk-assessments" title="Risk Assessments" />} />
             <Route path="/fire-detections" element={<FeaturePage feature="fire-detections" title="Fire Detections" />} />
