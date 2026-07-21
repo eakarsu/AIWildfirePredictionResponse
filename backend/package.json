@@ -6,7 +6,10 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "seed": "node src/seeds/seed.js"
+    "test": "node --test src/governance/tests/*.test.js",
+    "create-admin": "node scripts/create-admin.js",
+    "migrate": "../scripts/migrate.sh",
+    "seed": "../scripts/seed-development.sh"
   },
   "dependencies": {
     "axios": "^1.7.7",

@@ -1,0 +1,49 @@
+name: governed-wildfire-ci
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: wildfire_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/wildfire_ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+      - name: Install backend
+        working-directory: backend
+        run: npm ci
+      - name: Governed tests
+        working-directory: backend
+        run: npm test
+      - name: Syntax
+        run: find backend/src/governance -name '*.js' -type f -print0 | xargs -0 -n1 node --check
+      - name: Apply migration
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f backend/migrations/001_governed_wildfire.sql
+      - name: Build frontend
+        working-directory: frontend
+        run: npm ci && npm run build
+      - name: Shell safety
+        run: bash -n start.sh scripts/*.sh

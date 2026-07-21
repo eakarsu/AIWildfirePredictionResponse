@@ -1,51 +1,61 @@
-require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
+'use strict';
+
+const path = require('node:path');
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const { Pool } = require('pg');
+const rateLimit = require('express-rate-limit');
+const { createPool } = require('./governance/db');
+const { assertAuthConfiguration, authenticate } = require('./governance/auth');
+const { createGovernanceRouter } = require('./governance/routes');
+const { createAuthRouter } = require('./governance/authRoutes');
+const { WildfireError } = require('./governance/wildfireDomain');
 
-const app = express();
-const PORT = process.env.PORT || 3001;
+function assertConfiguration(env = process.env) {
+  assertAuthConfiguration(env);
+  if (!env.CLIENT_URL) throw new Error('CLIENT_URL is required');
+}
 
-app.use(helmet());
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
-  credentials: true,
-}));
-app.use(express.json({ limit: '10mb' }));
+function createApp({ pool, env = process.env }) {
+  assertConfiguration(env);
+  const app = express();
+  app.disable('x-powered-by');
+  app.use(helmet());
+  app.use(cors({ origin: env.CLIENT_URL, credentials: true, methods: ['GET', 'POST'] }));
+  app.use(express.json({ limit: '2mb' }));
+  app.use(rateLimit({ windowMs: 60_000, limit: Number(env.RATE_LIMIT_PER_MINUTE || 180), standardHeaders: true }));
+  app.get('/healthz', async (_req, res, next) => {
+    try { await pool.query('SELECT 1'); return res.json({ status: 'ok' }); } catch (error) { return next(error); }
+  });
+  app.get('/api/health', async (_req, res, next) => {
+    try { await pool.query('SELECT 1'); return res.json({ status: 'ok' }); } catch (error) { return next(error); }
+  });
+  app.use('/api/auth', createAuthRouter(pool, env));
+  app.use('/api/governance', authenticate(pool, env), createGovernanceRouter(pool));
+  app.use((_req, res) => res.status(404).json({ error: 'not_found' }));
+  app.use((error, _req, res, _next) => {
+    if (error instanceof WildfireError) {
+      const status = error.code.endsWith('_not_found') ? 404 : error.code.includes('blocked') ? 409 : 422;
+      return res.status(status).json({ error: error.code, message: error.message, details: error.details });
+    }
+    console.error({ name: error.name, message: error.message });
+    return res.status(500).json({ error: 'internal_error' });
+  });
+  return app;
+}
 
-// Database pool
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-app.locals.pool = pool;
+async function main() {
+  assertConfiguration(process.env);
+  const pool = createPool(process.env);
+  const port = Number(process.env.BACKEND_PORT);
+  if (!Number.isInteger(port) || port < 1) throw new Error('BACKEND_PORT is required');
+  const server = createApp({ pool, env: process.env }).listen(port, process.env.BIND_HOST || '127.0.0.1');
+  const shutdown = () => server.close(async () => { await pool.end(); process.exit(0); });
+  process.once('SIGINT', shutdown);
+  process.once('SIGTERM', shutdown);
+}
 
-// Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/risk-assessments', require('./routes/riskAssessments'));
-app.use('/api/fire-detections', require('./routes/fireDetections'));
-app.use('/api/evacuation-plans', require('./routes/evacuationPlans'));
-app.use('/api/resource-allocations', require('./routes/resourceAllocations'));
-app.use('/api/weather-analyses', require('./routes/weatherAnalyses'));
-app.use('/api/smoke-reports', require('./routes/smokeReports'));
-app.use('/api/community-alerts', require('./routes/communityAlerts'));
-app.use('/api/damage-assessments', require('./routes/damageAssessments'));
-app.use('/api/spread-predictions', require('./routes/spreadPredictions'));
-app.use('/api/water-sources', require('./routes/waterSources'));
-app.use('/api/crew-deployments', require('./routes/crewDeployments'));
-app.use('/api/equipment-tracking', require('./routes/equipmentTracking'));
-app.use('/api/ai-center', require('./routes/aiCenter'));
-app.use('/api/ai', require('./routes/aiFeatures'));
-app.use('/api/ext', require('./routes/extensions')); // Apply pass 5: backlog
-app.use('/api/custom', require('./routes/customFeatures'));
-app.use('/api/custom-views', require('./routes/customViews'));
+if (require.main === module) main().catch((error) => { console.error(error.message); process.exit(1); });
 
-app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
-
-// // === Batch 09 Gaps & Frontend Mounts ===
-app.use('/api/gap-ai-aiwildfirepredictionresponse', require('./routes/batch09GapAi')); // // === Batch 09 Gaps & Frontend Mounts ===
-app.use('/api/gap-nonai-aiwildfirepredictionresponse', require('./routes/batch09GapNonai')); // // === Batch 09 Gaps & Frontend Mounts ===
-
-app.listen(PORT, () => {
-  console.log(`Backend server running on port ${PORT}`);
-});
-
-
+module.exports = { assertConfiguration, createApp };
