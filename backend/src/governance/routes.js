@@ -6,6 +6,7 @@ const {
   digest, ingestTelemetry, proposeAction, replayForecast, transitionAction,
 } = require('./wildfireDomain');
 const { requireRoles } = require('./auth');
+const { requestAdvice } = require('../services/openrouterRuntime');
 
 async function transaction(pool, work) {
   const client = await pool.connect();
@@ -30,6 +31,21 @@ function audit(client, auth, action, entityType, entityId, evidence = {}) {
 
 function createGovernanceRouter(pool) {
   const router = express.Router();
+
+  router.post('/ai/incident-advice', requireRoles('administrator', 'incident_commander', 'analyst'), async (req, res, next) => {
+    try {
+      if (!req.body || typeof req.body !== 'object' || !Object.keys(req.body).length) {
+        return res.status(400).json({ error: 'incident_context_required' });
+      }
+      const advice = await requestAdvice(req.body);
+      const saved = await pool.query(
+        `INSERT INTO wildfire_ai_results(tenant_id,user_id,input,result,model)
+         VALUES($1,$2,$3::jsonb,$4::jsonb,$5) RETURNING id,created_at`,
+        [req.auth.tenantId, req.auth.userId, JSON.stringify(req.body), JSON.stringify({ text: advice.result }), advice.model],
+      );
+      return res.json({ success: true, result: advice.result, model: advice.model, persisted: saved.rows[0] });
+    } catch (error) { return next(error); }
+  });
 
   router.post('/incidents', requireRoles('administrator', 'incident_commander'), async (req, res, next) => {
     try {
