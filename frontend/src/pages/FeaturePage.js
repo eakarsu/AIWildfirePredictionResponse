@@ -243,7 +243,9 @@ export default function FeaturePage({ feature, title }) {
   const fetchItems = useCallback(async () => {
     try {
       const { data } = await api.get(`/${feature}`);
-      setItems(data);
+      const items = Array.isArray(data) ? data : data?.data;
+      if (!Array.isArray(items)) throw new Error('Invalid list response');
+      setItems(items);
     } catch (err) {
       console.error(err);
     } finally {
