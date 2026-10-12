@@ -1,5 +1,8 @@
+
+import FullAIExamples, { useFullAIExamples } from "../components/FullAIExamples.jsx";
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import FormattedAIReport from '../components/FormattedAIReport';
 import api from '../services/api';
 
 const aiTools = [
@@ -38,6 +41,8 @@ const quickTools = [
 ];
 
 export default function AICenter() {
+  const fullAIExamples = useFullAIExamples();
+
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [category, setCategory] = useState('general');
@@ -77,7 +82,7 @@ export default function AICenter() {
   };
 
   return (
-    <div>
+    <div data-full-ai-workspace="AICenter">
       <div className="page-header">
         <h1>🧠 AI Command Center</h1>
       </div>
@@ -109,19 +114,20 @@ export default function AICenter() {
           <div key={tool.key} className="ai-tool-card">
             <h3 style={{ marginBottom: 16 }}>{tool.title}</h3>
             {activeQuickTool === tool.key ? (
-              <div>
+              <div data-full-ai-workspace="AICenterQuick">
+                <FullAIExamples controller={fullAIExamples} disabled={Boolean(quickLoading)} />
                 {tool.fields.map(field => (
                   <div key={field.key} className="form-group" style={{ marginBottom: 12 }}>
                     <label>{field.label}</label>
                     {field.type === 'textarea' ? (
-                      <textarea value={quickFormData[field.key] || ''} onChange={e => setQuickFormData({ ...quickFormData, [field.key]: e.target.value })} rows={3} />
+                      <textarea value={quickFormData[field.key] || ''} onChange={e => setQuickFormData({ ...quickFormData, [field.key]: e.target.value })} rows={3} data-full-ai-field={fullAIExamples.bind({ current: quickFormData[field.key] || '', change: e => setQuickFormData({ ...quickFormData, [field.key]: e.target.value }), label: "quickFormData[field.key]", manual: false, json: false }, "p1-5749", [(typeof tool === 'object' ? tool?.key ?? tool?.name ?? tool?.id ?? '' : tool),(typeof field === 'object' ? field?.key ?? field?.name ?? field?.id ?? '' : field),field.key].join(":"))} />
                     ) : field.type === 'select' ? (
-                      <select value={quickFormData[field.key] || ''} onChange={e => setQuickFormData({ ...quickFormData, [field.key]: e.target.value })}>
+                      <select value={quickFormData[field.key] || ''} onChange={e => setQuickFormData({ ...quickFormData, [field.key]: e.target.value })} data-full-ai-field={fullAIExamples.bind({ current: quickFormData[field.key] || '', change: e => setQuickFormData({ ...quickFormData, [field.key]: e.target.value }), label: "quickFormData[field.key]", manual: false, json: false }, "p1-5968", [(typeof tool === 'object' ? tool?.key ?? tool?.name ?? tool?.id ?? '' : tool),(typeof field === 'object' ? field?.key ?? field?.name ?? field?.id ?? '' : field),field.key].join(":"))}>
                         <option value="">Select...</option>
                         {field.options.map(o => <option key={o} value={o}>{o}</option>)}
                       </select>
                     ) : (
-                      <input type={field.type} value={quickFormData[field.key] || ''} onChange={e => setQuickFormData({ ...quickFormData, [field.key]: e.target.value })} />
+                      <input type={field.type} value={quickFormData[field.key] || ''} onChange={e => setQuickFormData({ ...quickFormData, [field.key]: e.target.value })} data-full-ai-field={fullAIExamples.bind({ current: quickFormData[field.key] || '', change: e => setQuickFormData({ ...quickFormData, [field.key]: e.target.value }), label: "quickFormData[field.key]", manual: false, json: false }, "p1-6329", [(typeof tool === 'object' ? tool?.key ?? tool?.name ?? tool?.id ?? '' : tool),(typeof field === 'object' ? field?.key ?? field?.name ?? field?.id ?? '' : field),field.key].join(":"))} />
                     )}
                   </div>
                 ))}
@@ -139,7 +145,7 @@ export default function AICenter() {
                       <span className="model-tag">Claude Haiku 4.5</span>
                     </div>
                     <div className="ai-analysis-body">
-                      <ReactMarkdown>{quickResult}</ReactMarkdown>
+                      <FormattedAIReport response={quickResult} title={tool.title} />
                     </div>
                   </div>
                 )}
@@ -176,7 +182,9 @@ export default function AICenter() {
             <div key={i} className={`ai-message ${msg.role === 'user' ? 'user' : 'assistant'}`}>
               <div className="message-avatar">{msg.role === 'user' ? '👤' : '🧠'}</div>
               <div className="message-content">
-                <ReactMarkdown>{msg.content}</ReactMarkdown>
+                {msg.role === 'assistant'
+                  ? <FormattedAIReport response={msg.content} title="AI assistant response" />
+                  : <ReactMarkdown>{msg.content}</ReactMarkdown>}
               </div>
             </div>
           ))}
@@ -190,8 +198,9 @@ export default function AICenter() {
           )}
         </div>
 
-        <div className="ai-chat-input">
-          <select value={category} onChange={e => setCategory(e.target.value)}>
+        <div className="ai-chat-input" data-full-ai-workspace="AICenterChat">
+          <FullAIExamples controller={fullAIExamples} disabled={Boolean(loading)} />
+          <select value={category} onChange={e => setCategory(e.target.value)} data-full-ai-field={fullAIExamples.bind({ current: category, change: e => setCategory(e.target.value), label: "category", manual: false, json: false, sample: 'general' }, "p1-9762", undefined)}>
             {aiTools.map(t => <option key={t.key} value={t.key}>{t.title}</option>)}
           </select>
           <input
@@ -199,7 +208,7 @@ export default function AICenter() {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && sendMessage()}
-            placeholder="Ask the AI assistant..."
+            placeholder="Ask the AI assistant..." data-full-ai-field={fullAIExamples.bind({ current: input, change: e => setInput(e.target.value), label: "input", manual: false, json: false, sample: '' }, "p1-9947", undefined)}
           />
           <button className="btn btn-ai" onClick={sendMessage} disabled={loading}>
             Send

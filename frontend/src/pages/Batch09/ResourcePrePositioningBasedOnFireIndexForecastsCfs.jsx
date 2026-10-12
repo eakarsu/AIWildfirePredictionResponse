@@ -1,3 +1,5 @@
+import FormattedAIReport from "../../components/FormattedAIReport";
+import WildfirePromptPresets from "../../components/WildfirePromptPresets";
 // // === Batch 09 Gaps & Frontend Mounts ===
 import React, { useState } from 'react';
 
@@ -34,6 +36,7 @@ export default function ResourcePrePositioningBasedOnFireIndexForecastsPage() {
         rows={6}
         style={{ width: '100%', padding: 12, border: '1px solid #ccc', borderRadius: 6, marginBottom: 12 }}
       />
+      <WildfirePromptPresets topic="Resource pre-positioning based on fire-index forecasts" onFill={setInput} disabled={loading} />
       <button
         onClick={run}
         disabled={loading}
@@ -43,9 +46,7 @@ export default function ResourcePrePositioningBasedOnFireIndexForecastsPage() {
       </button>
       {error && <div style={{ color: 'red', marginTop: 12 }}>{error}</div>}
       {result && (
-        <pre style={{ marginTop: 16, padding: 12, background: '#f4f4f4', borderRadius: 6, overflow: 'auto', maxHeight: 500 }}>
-{JSON.stringify(result, null, 2)}
-        </pre>
+        <FormattedAIReport response={result} />
       )}
     </div>
   );

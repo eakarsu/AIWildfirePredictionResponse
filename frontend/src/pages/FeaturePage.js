@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import ReactMarkdown from 'react-markdown';
+import FormattedAIReport from '../components/FormattedAIReport';
 import api from '../services/api';
 
 const featureConfigs = {
@@ -396,7 +396,7 @@ export default function FeaturePage({ feature, title }) {
                     <span className="model-tag">Claude Haiku 4.5</span>
                   </div>
                   <div className="ai-analysis-body">
-                    <ReactMarkdown>{selectedItem.ai_analysis}</ReactMarkdown>
+                    <FormattedAIReport response={selectedItem.ai_analysis} title="AI analysis" />
                   </div>
                 </div>
               )}

@@ -33,7 +33,15 @@ function createApp({ pool, env = process.env }) {
   });
   app.use('/api/auth', createAuthRouter(pool, env));
   app.use('/api/governance', authenticate(pool, env), createGovernanceRouter(pool));
-  app.use((_req, res) => res.status(404).json({ error: 'not_found' }));
+
+// Advisory AI reports only; native execution and approval routes stay unchanged.
+const aiWorkspaceSupport = require("../aiWorkspaceAdapters.cjs");
+const aiWorkspaceDatabase = pool;
+app.use('/api/report-workspace', require("../aiWorkspace.cjs").createAIWorkspaceRouter({
+  pool: aiWorkspaceDatabase, env, authenticateToken: aiWorkspaceSupport.verifiedActorAuth(require("./governance/auth.js").authenticate(pool, env)),
+  aiRateLimiter: aiWorkspaceSupport.createWorkspaceLimiter(), features: require("../aiWorkspaceFeatures.json"),
+}));
+app.use((_req, res) => res.status(404).json({ error: 'not_found' }));
   app.use((error, _req, res, _next) => {
     if (error instanceof WildfireError) {
       const status = error.code.endsWith('_not_found') ? 404 : error.code.includes('blocked') ? 409 : 422;

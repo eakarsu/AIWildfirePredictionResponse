@@ -1,3 +1,4 @@
+import AIReportLibrary from "./AIReportLibrary";
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -72,7 +73,7 @@ export default function Sidebar({ open, onToggle, user, onLogout }) {
           </div>
           <button className="logout-btn" onClick={onLogout}>Logout</button>
         </div>
-      </aside>
+      <AIReportLibrary /></aside>
     </>
   );
 }

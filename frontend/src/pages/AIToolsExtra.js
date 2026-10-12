@@ -1,3 +1,6 @@
+
+import FullAIExamples, { useFullAIExamples } from "../components/FullAIExamples.jsx";
+import FormattedAIReport from "../components/FormattedAIReport";
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import api from '../services/api';
@@ -97,6 +100,8 @@ const TOOLS = [
 ];
 
 function ToolCard({ tool }) {
+  const fullAIExamples = useFullAIExamples();
+
   const [form, setForm] = useState({});
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
@@ -132,18 +137,18 @@ function ToolCard({ tool }) {
   };
 
   return (
-    <div className="ai-tool-card" style={{ marginBottom: 16 }}>
+    <div className="ai-tool-card" style={{ marginBottom: 16 }} data-full-ai-workspace="ToolCard"><FullAIExamples controller={fullAIExamples} disabled={Boolean(loading)} />
       <h3>{tool.title}</h3>
       <p style={{ color: 'var(--text-secondary)', marginBottom: 12 }}>{tool.desc}</p>
       {tool.fields.map(f => (
         <div key={f.key} className="form-group" style={{ marginBottom: 8 }}>
           <label>{f.label}</label>
           {f.type === 'textarea' ? (
-            <textarea rows={3} value={form[f.key] || ''} onChange={e => setForm({ ...form, [f.key]: e.target.value })} />
+            <textarea rows={3} value={form[f.key] || ''} onChange={e => setForm({ ...form, [f.key]: e.target.value })} data-full-ai-field={fullAIExamples.bind({ current: form[f.key] || '', change: e => setForm({ ...form, [f.key]: e.target.value }), label: "form[f.key]", manual: false, json: false }, "p1-7150", [(typeof f === 'object' ? f?.key ?? f?.name ?? f?.id ?? '' : f),f.key].join(":"))} />
           ) : f.type === 'json' ? (
-            <textarea rows={5} placeholder={f.placeholder || ''} style={{ fontFamily: 'monospace' }} value={form[f.key] || ''} onChange={e => setForm({ ...form, [f.key]: e.target.value })} />
+            <textarea rows={5} placeholder={f.placeholder || ''} style={{ fontFamily: 'monospace' }} value={form[f.key] || ''} onChange={e => setForm({ ...form, [f.key]: e.target.value })} data-full-ai-field={fullAIExamples.bind({ current: form[f.key] || '', change: e => setForm({ ...form, [f.key]: e.target.value }), label: "form[f.key]", manual: false, json: false }, "p1-7308", [(typeof f === 'object' ? f?.key ?? f?.name ?? f?.id ?? '' : f),f.key].join(":"))} />
           ) : (
-            <input type={f.type || 'text'} placeholder={f.placeholder || ''} value={form[f.key] || ''} onChange={e => setForm({ ...form, [f.key]: e.target.value })} />
+            <input type={f.type || 'text'} placeholder={f.placeholder || ''} value={form[f.key] || ''} onChange={e => setForm({ ...form, [f.key]: e.target.value })} data-full-ai-field={fullAIExamples.bind({ current: form[f.key] || '', change: e => setForm({ ...form, [f.key]: e.target.value }), label: "form[f.key]", manual: false, json: false }, "p1-7516", [(typeof f === 'object' ? f?.key ?? f?.name ?? f?.id ?? '' : f),f.key].join(":"))} />
           )}
         </div>
       ))}
@@ -158,11 +163,7 @@ function ToolCard({ tool }) {
             <h4>Result</h4>
           </div>
           <div className="ai-analysis-body">
-            {result.ai_raw ? (
-              <ReactMarkdown>{result.ai_raw}</ReactMarkdown>
-            ) : (
-              <pre style={{ whiteSpace: 'pre-wrap', fontSize: 12 }}>{JSON.stringify(result.result || result, null, 2)}</pre>
-            )}
+            {<FormattedAIReport response={result.result || result} />}
           </div>
         </div>
       )}

@@ -1,0 +1,58 @@
+[
+  {
+    "name": "DroneImageryIngestPipelinePage",
+    "id": "gap-nonai-aiwildfirepredictionresponse/drone-imagery-ingest-pipeline",
+    "title": "Drone imagery ingest pipeline",
+    "description": "Prepare a professional advisory report for drone imagery ingest pipeline using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "InsuranceClaimSupportModulePage",
+    "id": "gap-nonai-aiwildfirepredictionresponse/insurance-claim-support-module",
+    "title": "Insurance claim support module",
+    "description": "Prepare a professional advisory report for insurance claim support module using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "MutualAidResourceRequestWorkflowPage",
+    "id": "gap-nonai-aiwildfirepredictionresponse/mutual-aid-resource-request-workflow",
+    "title": "Mutual-aid resource request workflow",
+    "description": "Prepare a professional advisory report for mutual-aid resource request workflow using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "PredictiveCrewFatigueAndInjuryRiskPage",
+    "id": "gap-ai-aiwildfirepredictionresponse/predictive-crew-fatigue-and-injury-risk",
+    "title": "Predictive crew fatigue and injury risk",
+    "description": "Prepare a professional advisory report for predictive crew fatigue and injury risk using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "PropertySpecificStructuralLossPredictionPage",
+    "id": "gap-ai-aiwildfirepredictionresponse/property-specific-structural-loss-prediction",
+    "title": "Property-specific structural-loss prediction",
+    "description": "Prepare a professional advisory report for property-specific structural-loss prediction using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "PublicFacingAlertSubscriptionPortalPage",
+    "id": "gap-nonai-aiwildfirepredictionresponse/public-facing-alert-subscription-portal",
+    "title": "Public-facing alert subscription portal",
+    "description": "Prepare a professional advisory report for public-facing alert subscription portal using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "RealTimeCaddispatchRadioIntegrationPage",
+    "id": "gap-nonai-aiwildfirepredictionresponse/real-time-caddispatch-radio-integration",
+    "title": "Real-time CAD/dispatch radio integration",
+    "description": "Prepare a professional advisory report for real-time cad/dispatch radio integration using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "SmokePlumeAirQualityForecastingPage",
+    "id": "gap-ai-aiwildfirepredictionresponse/smoke-plume-air-quality-forecasting",
+    "title": "Smoke plume / air-quality forecasting",
+    "description": "Prepare a professional advisory report for smoke plume / air-quality forecasting using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  }
+]
