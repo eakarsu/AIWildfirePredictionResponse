@@ -33,6 +33,7 @@ function createApp({ pool, env = process.env }) {
   });
   app.use('/api/auth', createAuthRouter(pool, env));
   app.use('/api/governance', authenticate(pool, env), createGovernanceRouter(pool));
+  app.use('/api/feature-pack', require('./routes/featurePack'));
 
 // Advisory AI reports only; native execution and approval routes stay unchanged.
 const aiWorkspaceSupport = require("../aiWorkspaceAdapters.cjs");
